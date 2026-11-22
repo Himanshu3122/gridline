@@ -1,6 +1,6 @@
 import Link from "next/link";
+import PostCard from "@/components/PostCard";
 import PostCover from "@/components/PostCover";
-import PostRow from "@/components/PostRow";
 import { basePath, categories, categoryByName, site } from "@/lib/data";
 import { formatDate, getAllPosts } from "@/lib/posts";
 
@@ -8,81 +8,116 @@ export default function Home() {
   const posts = getAllPosts();
   const lead = posts.find((p) => p.featured) ?? posts[0];
   const others = posts.filter((p) => p !== lead);
-  const top = others.slice(0, 3);
+  const leadCat = lead ? categoryByName(lead.category) : undefined;
+
+  // Highlight the last three words of the tagline ("the power grid").
+  const words = site.tagline.split(" ");
+  const cut = Math.max(0, words.length - 3);
+  const taglineHead = words.slice(0, cut).join(" ");
+  const taglineTail = words.slice(cut).join(" ");
 
   return (
     <>
-      <section className="masthead">
+      <section className="hero night">
         <div className="container">
-          <p className="kicker">
-            <span className="kicker-accent">●</span>&nbsp; {site.tagline}
-          </p>
+          <div className="reveal">
+            <p className="kicker">
+              <span className="kicker-dot" />
+              {posts.length} stories · {categories.length} sections
+            </p>
+            <h1 className="hero-title">
+              {taglineHead} <span className="hl">{taglineTail}</span>.
+            </h1>
+            <p className="hero-sub">{site.description}</p>
+            <div className="hero-actions">
+              <a href="#latest" className="btn btn-volt">
+                Read the latest
+              </a>
+              <a href={`${basePath}/feed.xml`} className="btn btn-ghost">
+                Subscribe via RSS
+              </a>
+            </div>
+          </div>
+
+          {lead && (
+            <Link href={`/posts/${lead.slug}/`} className="feature reveal reveal-2">
+              <PostCover slug={lead.slug} category={lead.category} />
+              <div className="feature-body">
+                <div className="meta">
+                  <span className="pill" data-cat={leadCat?.slug}>
+                    Featured · {lead.category}
+                  </span>
+                  <span>{formatDate(lead.date)}</span>
+                  <span>{lead.readingMinutes} min read</span>
+                </div>
+                <h2>{lead.title}</h2>
+                <p>{lead.dek}</p>
+                <span className="read-link">Read the story →</span>
+              </div>
+            </Link>
+          )}
         </div>
       </section>
 
-      {lead && (
-        <section className="container top-stories">
-          <Link href={`/posts/${lead.slug}/`} className="card-feature lead-story reveal">
-            <PostCover slug={lead.slug} category={lead.category} />
-            <div className="meta">
-              <span className="cat">{lead.category}</span>
-              <span>{formatDate(lead.date)}</span>
-              <span>{lead.readingMinutes} min read</span>
+      {others.length > 0 && (
+        <section className="section" id="latest">
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <p className="kicker">The latest</p>
+                <h2>Fresh off the wire</h2>
+              </div>
             </div>
-            <h3>{lead.title}</h3>
-            <p>{lead.dek}</p>
-          </Link>
-          <div className="post-list side-stories reveal reveal-2">
-            <p className="kicker" style={{ marginBottom: 16 }}>Top stories</p>
-            {top.map((p) => (
-              <Link key={p.slug} href={`/posts/${p.slug}/`} className="post-row">
-                <div className="meta">
-                  <span className="cat">{p.category}</span>
-                  <span>{formatDate(p.date)}</span>
-                </div>
-                <h3>{p.title}</h3>
-              </Link>
-            ))}
+            <div className="card-grid">
+              {others.map((p) => (
+                <PostCard key={p.slug} p={p} />
+              ))}
+            </div>
           </div>
         </section>
       )}
 
-      <section className="section">
-        <div className="container river-layout">
-          <div>
-            <div className="section-head">
-              <div>
-                <p className="kicker">The latest</p>
-                <h2>All stories</h2>
-              </div>
-            </div>
-            <div className="river">
-              {posts.map((p) => (
-                <PostRow key={p.slug} p={p} />
-              ))}
+      <section className="section" style={{ paddingTop: 0 }}>
+        <div className="container">
+          <div className="section-head">
+            <div>
+              <p className="kicker">Sections</p>
+              <h2>Browse by topic</h2>
             </div>
           </div>
-
-          <aside className="sidebar">
-            <p className="kicker">Sections</p>
-            <ul className="section-list">
-              {categories.map((c) => {
-                const n = posts.filter((p) => categoryByName(p.category)?.slug === c.slug).length;
-                return (
-                  <li key={c.slug}>
-                    <Link href={`/category/${c.slug}/`}>
-                      <strong>{c.name}</strong>
-                      <span className="mono muted">{n}</span>
-                    </Link>
+          <div className="topic-grid">
+            {categories.map((c) => {
+              const n = posts.filter((p) => categoryByName(p.category)?.slug === c.slug).length;
+              return (
+                <Link key={c.slug} href={`/category/${c.slug}/`} className="topic-tile" data-cat={c.slug}>
+                  <div className="topic-top">
+                    <span>
+                      {n} {n === 1 ? "story" : "stories"}
+                    </span>
+                    <span className="topic-arrow" aria-hidden>
+                      →
+                    </span>
+                  </div>
+                  <div>
+                    <h3>{c.name}</h3>
                     <p>{c.description}</p>
-                  </li>
-                );
-              })}
-            </ul>
-            <a href={`${basePath}/feed.xml`} className="btn" style={{ marginTop: 24 }}>
-              Subscribe via RSS
-            </a>
-          </aside>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="container cta-wrap">
+        <div className="cta">
+          <div>
+            <h2>Never miss a story.</h2>
+            <p>New posts land in your feed reader the day they are published. No account, no email list.</p>
+          </div>
+          <a href={`${basePath}/feed.xml`} className="btn">
+            Subscribe via RSS
+          </a>
         </div>
       </section>
     </>

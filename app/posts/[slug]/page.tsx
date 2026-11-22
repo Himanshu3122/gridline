@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PostCard from "@/components/PostCard";
 import PostCover from "@/components/PostCover";
+import ReadingProgress from "@/components/ReadingProgress";
 import { categoryByName, site } from "@/lib/data";
 import { formatDate, getAllPosts, getPost } from "@/lib/posts";
 
@@ -44,15 +46,16 @@ export default async function PostPage({ params }: Params) {
   return (
     <article>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <ReadingProgress />
       <div className="container">
-        <header className="article-head">
+        <header className="article-head reveal">
           <div className="meta">
             {cat ? (
-              <Link href={`/category/${cat.slug}/`} className="cat">
+              <Link href={`/category/${cat.slug}/`} className="pill" data-cat={cat.slug}>
                 {cat.name}
               </Link>
             ) : (
-              <span className="cat">{post.category}</span>
+              <span className="pill">{post.category}</span>
             )}
             <span>{formatDate(post.date)}</span>
             <span>{post.readingMinutes} min read</span>
@@ -94,7 +97,7 @@ export default async function PostPage({ params }: Params) {
       </div>
 
       {more.length > 0 && (
-        <section className="section read-next">
+        <section className="section night">
           <div className="container">
             <div className="section-head">
               <div>
@@ -102,17 +105,9 @@ export default async function PostPage({ params }: Params) {
                 <h2>More from {related.length ? post.category : site.name}</h2>
               </div>
             </div>
-            <div className="card-grid">
+            <div className="card-grid three">
               {more.map((p) => (
-                <Link key={p.slug} href={`/posts/${p.slug}/`} className="card">
-                  <PostCover slug={p.slug} category={p.category} />
-                  <div className="meta">
-                    <span className="cat">{p.category}</span>
-                    <span>{formatDate(p.date)}</span>
-                  </div>
-                  <h3>{p.title}</h3>
-                  <p>{p.dek}</p>
-                </Link>
+                <PostCard key={p.slug} p={p} compact />
               ))}
             </div>
           </div>

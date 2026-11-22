@@ -1,17 +1,15 @@
 import Link from "next/link";
+import Brand from "./Brand";
 import { basePath, categories, site } from "@/lib/data";
 
 export default function Footer() {
   return (
-    <footer className="site-footer">
+    <footer className="site-footer night">
       <div className="container">
         <div className="footer-grid">
           <div>
-            <Link href="/" className="brand" style={{ color: "var(--ink)" }}>
-              <span className="brand-mark" aria-hidden />
-              {site.name}
-            </Link>
-            <p style={{ marginTop: 14, maxWidth: 420 }}>{site.description}</p>
+            <Brand />
+            <p className="footer-about">{site.description}</p>
           </div>
           <div>
             <h4>Sections</h4>
@@ -35,6 +33,9 @@ export default function Footer() {
           <span>© {new Date().getFullYear()} {site.name}</span>
           <span>{site.tagline}</span>
         </div>
+        <p className="wordmark" aria-hidden>
+          {site.name}
+        </p>
       </div>
     </footer>
   );

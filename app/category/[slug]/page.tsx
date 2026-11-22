@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import PostRow from "@/components/PostRow";
+import PostCard from "@/components/PostCard";
 import { categories } from "@/lib/data";
 import { getAllPosts } from "@/lib/posts";
 
@@ -24,25 +24,25 @@ export default async function CategoryPage({ params }: Params) {
 
   return (
     <>
-      <header className="page-head">
-        <div className="container">
-          <p className="kicker">Section</p>
+      <header className="page-head" data-cat={c.slug}>
+        <div className="container reveal">
+          <p className="kicker">
+            Section · {posts.length} {posts.length === 1 ? "story" : "stories"}
+          </p>
           <h1>{c.name}</h1>
           <p>{c.description}</p>
         </div>
       </header>
-      <section className="section" style={{ paddingTop: 32 }}>
-        <div className="container">
-          {posts.length ? (
-            <div className="river" style={{ maxWidth: 860 }}>
-              {posts.map((p) => (
-                <PostRow key={p.slug} p={p} />
-              ))}
-            </div>
-          ) : (
-            <p className="muted">No stories in this section yet.</p>
-          )}
-        </div>
+      <section className="container cta-wrap">
+        {posts.length ? (
+          <div className="card-grid">
+            {posts.map((p) => (
+              <PostCard key={p.slug} p={p} />
+            ))}
+          </div>
+        ) : (
+          <p className="muted">No stories in this section yet.</p>
+        )}
       </section>
     </>
   );

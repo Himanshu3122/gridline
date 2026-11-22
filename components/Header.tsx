@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { basePath, categories, site } from "@/lib/data";
+import Brand from "./Brand";
+import { basePath, categories } from "@/lib/data";
 
 function ThemeToggle() {
   const [dark, setDark] = useState<boolean | null>(null);
@@ -48,10 +49,7 @@ export default function Header() {
     <header className="site-header">
       <div className="container">
         <div className="header-inner">
-          <Link href="/" className="brand" aria-label={`${site.name} home`}>
-            <span className="brand-mark" aria-hidden />
-            {site.name}
-          </Link>
+          <Brand />
           <nav className="nav" aria-label="Categories">
             {categories.map((c) => {
               const href = `/category/${c.slug}/`;
@@ -63,7 +61,7 @@ export default function Header() {
             })}
           </nav>
           <div className="header-actions">
-            <a href={`${basePath}/feed.xml`} className="icon-btn" aria-label="RSS feed" title="RSS feed">
+            <a href={`${basePath}/feed.xml`} className="icon-btn icon-rss" aria-label="RSS feed" title="RSS feed">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
                 <path d="M5 11a8 8 0 0 1 8 8M5 5a14 14 0 0 1 14 14" />
                 <circle cx="6" cy="18" r="1.4" fill="currentColor" />

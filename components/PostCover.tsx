@@ -1,3 +1,5 @@
+import { categoryByName } from "@/lib/data";
+
 // Generative cover art for posts: a deterministic pattern seeded by the slug,
 // styled per category, so every post has a distinct image without stock photos.
 
@@ -47,10 +49,10 @@ export default function PostCover({
     art = (
       <>
         {edges.map(([a, b], k) => (
-          <line key={k} x1={nodes[a][0]} y1={nodes[a][1]} x2={nodes[b][0]} y2={nodes[b][1]} stroke="var(--line-strong)" strokeWidth="1.5" />
+          <line key={k} x1={nodes[a][0]} y1={nodes[a][1]} x2={nodes[b][0]} y2={nodes[b][1]} stroke="var(--cover-fg)" strokeOpacity="0.45" strokeWidth="1.5" />
         ))}
         {nodes.map(([x, y], k) => (
-          <circle key={k} cx={x} cy={y} r={k % 5 === 0 ? 12 : 7} fill={k % 5 === 0 ? "var(--accent)" : "var(--bg-elev)"} stroke="var(--ink)" strokeWidth="1.5" />
+          <circle key={k} cx={x} cy={y} r={k % 5 === 0 ? 12 : 7} fill={k % 5 === 0 ? "var(--cover-hi)" : "var(--cover-bg)"} stroke="var(--cover-fg)" strokeWidth="1.5" />
         ))}
       </>
     );
@@ -61,19 +63,19 @@ export default function PostCover({
     const xs = Array.from({ length: buses }, (_, i) => 70 + (i * (W - 140)) / (buses - 1));
     art = (
       <>
-        <line x1={xs[0]} y1={y0} x2={xs[buses - 1]} y2={y0} stroke="var(--ink)" strokeWidth="2" />
+        <line x1={xs[0]} y1={y0} x2={xs[buses - 1]} y2={y0} stroke="var(--cover-fg)" strokeWidth="2" />
         {xs.map((x, i) => {
           const down = r() > 0.4;
           const len = 60 + r() * 110;
           return (
             <g key={i}>
-              <rect x={x - 3} y={y0 - 16} width="6" height="32" fill="var(--ink)" />
-              {down && <line x1={x} y1={y0} x2={x} y2={y0 + len} stroke="var(--line-strong)" strokeWidth="1.5" />}
-              {down && <circle cx={x} cy={y0 + len} r="9" fill={i % 3 === 0 ? "var(--accent)" : "var(--bg-elev)"} stroke="var(--ink)" strokeWidth="1.5" />}
+              <rect x={x - 3} y={y0 - 16} width="6" height="32" fill="var(--cover-fg)" />
+              {down && <line x1={x} y1={y0} x2={x} y2={y0 + len} stroke="var(--cover-fg)" strokeOpacity="0.45" strokeWidth="1.5" />}
+              {down && <circle cx={x} cy={y0 + len} r="9" fill={i % 3 === 0 ? "var(--cover-hi)" : "var(--cover-bg)"} stroke="var(--cover-fg)" strokeWidth="1.5" />}
             </g>
           );
         })}
-        <path d={`M30 ${y0 - 70} q 20 -30 40 0 t 40 0`} fill="none" stroke="var(--accent)" strokeWidth="2" />
+        <path d={`M30 ${y0 - 70} q 20 -30 40 0 t 40 0`} fill="none" stroke="var(--cover-hi)" strokeWidth="2" />
       </>
     );
   } else if (category === "AI Infrastructure") {
@@ -96,8 +98,8 @@ export default function PostCover({
               width={cw - 6}
               height={rh - 6}
               rx="3"
-              fill={v > 0.82 ? "var(--accent)" : "var(--ink)"}
-              opacity={v > 0.82 ? 0.9 : 0.05 + v * 0.22}
+              fill={v > 0.82 ? "var(--cover-hi)" : "var(--cover-fg)"}
+              opacity={v > 0.82 ? 1 : 0.08 + v * 0.3}
             />
           );
         })}
@@ -114,15 +116,15 @@ export default function PostCover({
         const y = Math.exp(-((x - mu) ** 2) / (2 * s * s));
         return `${i ? "L" : "M"}${(x * W).toFixed(1)},${(base - y * 110).toFixed(1)}`;
       }).join(" ");
-      return <path key={k} d={d} fill="none" stroke={k === 2 ? "var(--accent)" : "var(--ink)"} strokeOpacity={k === 2 ? 1 : 0.35} strokeWidth="1.8" />;
+      return <path key={k} d={d} fill="none" stroke={k === 2 ? "var(--cover-hi)" : "var(--cover-fg)"} strokeOpacity={k === 2 ? 1 : 0.35} strokeWidth="1.8" />;
     });
     art = <>{curves}</>;
   }
 
   return (
-    <div className={`cover ${className}`}>
+    <div className={`cover ${className}`} data-cat={categoryByName(category)?.slug ?? "none"}>
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" aria-hidden>
-        <rect width={W} height={H} fill="var(--bg-sunk)" />
+        <rect width={W} height={H} fill="var(--cover-bg)" />
         {art}
       </svg>
       {label && <span className="cover-label">{category}</span>}
